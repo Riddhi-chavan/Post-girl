@@ -34,8 +34,8 @@ export const initializeWorkspace = async () => {
           },
         },
       },
-      include:{
-        members:true
+      include: {
+        members: true
       }
     });
 
@@ -51,4 +51,52 @@ export const initializeWorkspace = async () => {
     };
   }
 };
+
+export async function getWorkSpaces() {
+  const user = await currentUser()
+  if (!user) {
+    throw new Error("Unauthorized")
+  }
+
+  const workspaces = await db.workspace.findMany({
+    where: {
+      OR: [
+        { ownerId: user.id },
+        { members: { some: { userId: user.id } } }
+      ]
+    },
+    orderBy: { createdAt: "asc" }
+  })
+  return workspaces
+}
+
+export async function createWorkSpaces(name: string) {
+  const user = await currentUser()
+  if (!user) throw Error("Unauthorized")
+
+  const workspace = await db.workspace.create({
+    data: {
+      name,
+      ownerId: user.id,
+      members: {
+        create: {
+          userId: user.id,
+          role: MEMBER_ROLE.ADMIN
+        }
+      }
+    }
+  })
+
+  return workspace
+}
+
+export const getWorkSpaceById = async (id: string) => {
+  const workspace = await db.workspace.findUnique({
+    where: { id },
+    include: {
+      members: true
+    }
+  })
+  return workspace
+}
 
