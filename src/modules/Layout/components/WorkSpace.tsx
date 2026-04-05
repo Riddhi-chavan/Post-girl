@@ -55,13 +55,14 @@ const WorkSpace = () => {
                             <SelectItem key={ws.id} value={ws.id}>{ws.name}</SelectItem>
                         ))}
                         <Separator className="ml-1" />
-                        <div className="p-2 flex flex-row justify-between items-center">
+
+                        <div className="p-2 flex flex-row justify-between items-center w-full">
                             <span className="text-sm font-semibold text-zinc-600">
                                 My Workspaces
-                                <Button size={"icon"} variant={"outline"} onClick={(() => setIsModelOpen(true))}>
-                                    <Plus size={16} className="text-indigo-400" />
-                                </Button>
                             </span>
+                            <Button size={"icon"} variant={"outline"} onClick={(() => setIsModelOpen(true))}>
+                                <Plus size={16} className="text-indigo-400" />
+                            </Button>
                         </div>
                     </SelectContent>
                 </Select>
