@@ -23,8 +23,8 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
-  workSpaces   Workspace[]       @relation("UserWorkspaces")
-  memberships  WorkspaceMember[] 
+  workSpaces  Workspace[]       @relation("UserWorkspaces")
+  memberships WorkspaceMember[]
 
   @@unique([email])
   @@map("user")
@@ -79,16 +79,18 @@ model Verification {
 }
 
 model Workspace {
-  id          String   @id @default(cuid())  
-  name        String           
+  id          String  @id @default(cuid())
+  name        String
   description String?
   ownerId     String
-  owner       User     @relation("UserWorkspaces", fields: [ownerId], references: [id])
+  owner       User    @relation("UserWorkspaces", fields: [ownerId], references: [id])
 
-  members WorkspaceMember[] 
+  members     WorkspaceMember[]
+  collections Collection[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+
   @@unique([name, ownerId])
 }
 
@@ -98,9 +100,9 @@ enum MEMBER_ROLE {
   VIEWER
 }
 
-model WorkspaceMember {                        
-  id          String      @id @default(cuid())
-  role        MEMBER_ROLE @default(ADMIN)
+model WorkspaceMember {
+  id   String      @id @default(cuid())
+  role MEMBER_ROLE @default(ADMIN)
 
   userId      String
   workspaceId String
@@ -112,4 +114,16 @@ model WorkspaceMember {
   updatedAt DateTime @default(now()) @updatedAt
 
   @@unique([userId, workspaceId])
+}
+
+//------- collections ------
+
+model Collection {
+  id          String    @id @default(cuid())
+  name        String
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
