@@ -35,7 +35,7 @@ export function useEditCollection(collectionId: string, name: string) {
     const queryClient = useQueryClient()
 
     return useMutation({
-        mutationFn: async (name: string) => editCollection(collectionId, name),
+        mutationFn: async () => editCollection(collectionId, name),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["collections"] })
         }
