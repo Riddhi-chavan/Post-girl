@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { useCollections } from '../hooks/collections'
-import { Archive, Clock, Code, ExternalLink, HelpCircle, Loader, Share2 } from 'lucide-react'
+import { Archive, Clock, Code, ExternalLink, HelpCircle, Loader, Plus, Search, Share2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import CreateCollection from './createCollection'
 
 interface Props {
    currentWorkspace: {
@@ -46,6 +48,22 @@ export const TabbedSidebar = ({ currentWorkspace }: Props) => {
                         <ExternalLink className="w-4 h-4 text-zinc-400 hover:text-zinc-300 cursor-pointer" />
                      </div>
                   </div>
+                  <div className="p-4 border-b border-zinc-800">
+                     <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                        <input
+                           type="text"
+                           placeholder="Search"
+                           className="w-full bg-zinc-900 border border-zinc-700 rounded-lg pl-10 pr-4 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        />
+                     </div>
+                  </div>
+                  <div className='p-3 border-b border-zinc-800'>
+                     <Button variant={"ghost"} onClick={() => { setIsModelOpen(true) }}>
+                        <Plus className='w-4 h-4' />
+                        <span className='text-sm font-medium'>New</span>
+                     </Button>
+                  </div>
                </div>
             )
          default:
@@ -73,6 +91,12 @@ export const TabbedSidebar = ({ currentWorkspace }: Props) => {
          <div className='flex-1 bg-zinc-900 overflow-y-auto w-full text-white'>
             {renderTabContent()}
          </div>
+
+         <CreateCollection
+            workspaceId={currentWorkspace.id}
+            isModelOpen={isModelOpen}
+            setIsModelOpen={setIsModelOpen}
+         />
       </div>
    )
 }

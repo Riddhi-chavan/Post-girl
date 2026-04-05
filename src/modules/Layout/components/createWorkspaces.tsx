@@ -29,7 +29,7 @@ const CreateWorkspace = ({ isModelOpen, setIsModelOpen }: {
 
     return (
         <Model
-            title="Add new Workspace"
+            title="Add New Workspace"
             description="Create a new workspace to organize your project"
             isOpen={isModelOpen}
             onClose={() => setIsModelOpen(false)}
