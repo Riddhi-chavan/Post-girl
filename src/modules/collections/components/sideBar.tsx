@@ -3,6 +3,8 @@ import { useCollections } from '../hooks/collections'
 import { Archive, Clock, Code, ExternalLink, HelpCircle, Loader, Plus, Search, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import CreateCollection from './createCollection'
+import EmptyCollections from './emptyCollections'
+import CollectionFolder from './collectionFolder'
 
 interface Props {
    currentWorkspace: {
@@ -64,6 +66,18 @@ export const TabbedSidebar = ({ currentWorkspace }: Props) => {
                         <span className='text-sm font-medium'>New</span>
                      </Button>
                   </div>
+
+                  {collections && collections.length > 0 ? (
+                     collections.map((collection) => (
+                        <div className='flex flex-col justify-start items-start p-3 border-b border-zinc-800 w-full' key={collection.id}>
+                           <CollectionFolder collection={collection} />
+                        </div>
+                     ))
+
+                  )
+                     :
+                     (<EmptyCollections />)}
+
                </div>
             )
          default:
