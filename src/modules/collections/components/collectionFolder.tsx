@@ -4,6 +4,7 @@ import { ChevronDown, ChevronRight, Edit, EllipsisVertical, FilePlus, Folder, Tr
 import React, { useState } from 'react'
 import EditCollectionModel from './editCollectionsModel'
 import DeleteCollectionModel from './deleteCollectionsModel'
+import AddRequestCollectionModal from './addRequestModal'
 
 interface Props {
     collection: {
@@ -44,7 +45,7 @@ const CollectionFolder = ({ collection }: Props) => {
                             </div>
                         </CollapsibleTrigger>
                         <div className='flex flex-row justify-center items-center space-x-2'>
-                            <FilePlus className='h-4 w-4 text-zinc-400 hover:text-indigo-400 ' />
+                            <FilePlus className='h-4 w-4 text-zinc-400 hover:text-indigo-400 cursor-pointer' onClick={() => setIsAddRequestOpen(true)} />
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <button className="p-1 hover:bg-zinc-800 rounded">
@@ -104,6 +105,13 @@ const CollectionFolder = ({ collection }: Props) => {
                 isModalOpen={isDeleteOpen}
                 setIsModalOpen={setIsDeleteOpen}
                 collectionId={collection.id}
+            />
+
+            <AddRequestCollectionModal
+                isModalOpen={isAddRequestOpen}
+                setIsModalOpen={setIsAddRequestOpen}
+                collectionId={collection.id}
+                initialName="Untitled Request"
             />
         </>
     )
