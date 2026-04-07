@@ -5,12 +5,15 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react';
+import { useRunRequest } from '../hooks/request';
+import { toast } from 'sonner';
 
 interface Props {
     tab: RequestTab,
     updateTab: (id: string, data: Partial<RequestTab>) => void
 }
 const RequestBar = ({ tab, updateTab }: Props) => {
+    const { mutateAsync, isPending } = useRunRequest(tab.requestId!)
     const requestColorMap: Record<string, string> = {
         [REST_METHOD.GET]: "text-green-500",
         [REST_METHOD.POST]: "text-blue-500",
@@ -19,8 +22,13 @@ const RequestBar = ({ tab, updateTab }: Props) => {
         [REST_METHOD.PATCH]: "text-orange-500",
     };
 
-    const onSendRequest = () => {
-
+    const onSendRequest = async () => {
+        try {
+            const res = await mutateAsync();
+            toast.success("request sent successfully")
+        } catch (error) {
+            toast.error("Failed to sent request")
+        }
     }
     return (
         <div className='flex flex-row items-center justify-between bg-zinc-900 rounded-md px-2 py-2 w-full'>

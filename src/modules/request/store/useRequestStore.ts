@@ -26,6 +26,32 @@ export type RequestTab = {
     workspaceId?: string;
 };
 
+type HeadersMap = Record<string, string>;
+
+interface RequestRun {
+    id: string;
+    requestId?: string;
+    status?: number;
+    statusText?: string;
+    headers?: HeadersMap;
+    body?: string | object | null;
+    durationMs?: number;
+    createdAt?: string;
+}
+
+interface Result {
+    status?: number;
+    statusText?: string;
+    duration?: number;
+    size?: number;
+}
+
+export interface ResponseData {
+    success: boolean;
+    requestRun: RequestRun;
+    result?: Result;
+}
+
 type PlaygroundState = {
     tabs: RequestTab[];
     activeTabId: string | null;
@@ -36,12 +62,14 @@ type PlaygroundState = {
     markUnsaved: (id: string, value: boolean) => void;
     openRequestTab: (req: any) => void; // 👈 new
     updateTabFromSavedRequest: (tabId: string, savedRequest: SavedRequest) => void;
-    // responseViewerData: ResponseData | null;
-    // setResponseViewerData: (data: ResponseData) => void
+    responseViewerData: ResponseData | null;
+    setResponseViewerData: (data: ResponseData) => void
 };
 
 //@ts-ignore
 export const useRequestPlaygroundStore = create<PlaygroundState>((set) => ({
+    responseViewerData: null,
+    setResponseViewerData: (data) => set({ responseViewerData: data }),
     tabs: [],
     activeTabId: null,
 

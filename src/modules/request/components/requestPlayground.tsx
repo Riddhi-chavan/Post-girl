@@ -102,7 +102,7 @@ const RequestPlayground = () => {
         )
     }
     return (
-        <div className='flex flex-col h-full '>
+        <div className='flex flex-col h-screen '>
             <TabBar />
             <div className='flex-1 overflow-auto '>
                 <RequestEditor />

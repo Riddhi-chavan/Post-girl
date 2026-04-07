@@ -2,18 +2,22 @@ import React from 'react'
 import { useRequestPlaygroundStore } from '../store/useRequestStore'
 import RequestBar from './requestBar'
 import RequestEditorArea from './requestEditorArea'
+import ResponseViewer from './responseViewer'
 
 const RequestEditor = () => {
-    const { tabs, activeTabId, updateTab } = useRequestPlaygroundStore()
+    const { tabs, activeTabId, updateTab, responseViewerData } = useRequestPlaygroundStore()
     const activeTab = tabs.find((t) => t.id === activeTabId) || tabs[0]
     if (!activeTabId) return null
 
     return (
-        <div className='flex flex-col items-center justify-start py-4 px-4'>
+        <div className='flex flex-col items-center justify-start py-4 px-4 h-full'>
             <RequestBar tab={activeTab} updateTab={updateTab} />
             <div className='flex flex-1 flex-col w-full justify-start mt-4 items-center'>
                 <RequestEditorArea tab={activeTab} updateTab={updateTab} />
             </div>
+            {
+                responseViewerData && <ResponseViewer responseData={responseViewerData} />
+            }
         </div>
     )
 }
