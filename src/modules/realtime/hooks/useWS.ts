@@ -93,6 +93,187 @@ export const useWsStore = create<WsStore>()(
         get isReconnecting() {
             return get().status === 'reconnecting'
         },
+
+        connect: (url: string, options: WsOptions = {}) => {
+            const state = get()
+            if (state.ws) {
+                state.ws.close
+            }
+            if (state.reconnectTimeoutId) {
+                clearTimeout(state.reconnectTimeoutId)
+            }
+
+            set({
+                url,
+                options,
+                status: "connected",
+                isConnected: false,
+                error: null,
+                reconnectAttempts: 0
+            })
+
+            try {
+                const ws = new WebSocket(url)
+                ws.onopen = (event) => {
+                    console.log("Websocket connected to :", url)
+                    set({
+                        ws,
+                        status: "connected",
+                        error: null,
+                        isConnected: true,
+                        reconnectAttempts: 0
+                    })
+                    options.onOpen?.(event)
+                }
+
+                ws.onmessage = (event) => {
+                    get().addMessage({
+                        type: 'received',
+                        data: event.data,
+                        raw: event.data
+                    })
+                    options.onMessage?.(event)
+                }
+
+                ws.onclose = (event) => {
+                    console.log('WebSocket closed:', event.code, event.reason)
+
+                    set({ ws: null })
+                    options.onClose?.(event)
+
+                    // Handle reconnection
+                    if (options.autoReconnect && event.code !== 1000) {
+                        get().handleReconnect()
+                    } else {
+                        set({ status: 'disconnected' })
+                    }
+                }
+
+                ws.onerror = (event) => {
+                    console.error('WebSocket error:', event)
+                    set({
+                        status: 'error',
+                        error: 'Connection error occurred'
+                    })
+                    options.onError?.(event)
+                }
+
+            } catch (error) {
+                console.error('Failed to create WebSocket:', error)
+                set({
+                    status: 'error',
+                    error: error instanceof Error ? error.message : 'Failed to create WebSocket'
+                })
+                options.onError?.(error as Error)
+            }
+        },
+        disconnect: (code = 1000, reason = '') => {
+            const state = get()
+            if (state.reconnectTimeoutId) {
+                clearTimeout(state.reconnectTimeoutId)
+            }
+
+            if (state.ws) {
+                state.ws.close(code, reason)
+            }
+
+            set({
+                ws: null,
+                status: 'disconnected',
+                isConnected: false,
+                reconnectTimeoutId: null,
+                reconnectAttempts: 0
+            })
+        },
+
+        send: (data: string | object) => {
+            const state = get()
+
+            if (!state.ws || state.ws.readyState !== WebSocket.OPEN) {
+                console.warn('WebSocket is not connected')
+                return false
+            }
+
+            try {
+                const message = typeof data === 'string' ? data : JSON.stringify(data)
+                state.ws.send(message)
+
+                // Add to message history
+                get().addMessage({
+                    type: 'sent',
+                    data,
+                    raw: message
+                })
+
+                console.log('WebSocket message sent:', message)
+                return true
+            } catch (error) {
+                console.error('Failed to send message:', error)
+                set({ error: 'Failed to send message' })
+                return false
+            }
+        },
+
+        clearMessages: () => set({ messages: [] }),
+
+        // Draft message (editor)
+        setDraftMessage: (message: string) => set({ draftMessage: message }),
+
+        // Set error
+        setError: (error: string | null) => set({ error }),
+
+        // Set status (internal)
+        setStatus: (status: ConnectionStatus) => set({ status }),
+
+        addMessage: (message: Omit<WsMessage, 'id' | 'timestamp'>) => {
+            const newMessage: WsMessage = {
+                ...message,
+                id: crypto.randomUUID(),
+                timestamp: new Date()
+            }
+
+            set(state => ({
+                messages: [...state.messages, newMessage].slice(-100) // Keep last 100 messages
+            }))
+        },
+
+        handleReconnect: () => {
+            const state = get()
+
+            if (state.reconnectAttempts >= state.maxReconnectAttempts) {
+                console.log('Max reconnection attempts reached')
+                set({
+                    status: 'error',
+                    error: 'Max reconnection attempts reached'
+                })
+                return
+            }
+
+            const delay = (state.options.reconnectDelay || 3000) * Math.pow(1.5, state.reconnectAttempts)
+
+            set({
+                status: 'reconnecting',
+                reconnectAttempts: state.reconnectAttempts + 1
+            })
+
+            console.log(`Reconnecting in ${delay}ms (attempt ${state.reconnectAttempts + 1}/${state.maxReconnectAttempts})`)
+
+            const timeoutId = window.setTimeout(() => {
+                if (state.url) {
+                    get().connect(state.url, state.options)
+                }
+            }, delay)
+
+            set({ reconnectTimeoutId: timeoutId })
+        },
+
+        // Get WebSocket ready state
+        getReadyState: () => {
+            const ws = get().ws
+            return ws ? ws.readyState : WebSocket.CLOSED
+        }
     })
     )
+
+
 )   
