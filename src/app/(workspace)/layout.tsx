@@ -13,7 +13,7 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
         <>
             {/* @ts-ignore */}
             <Header user={user} />
-            <main className='max-h-[calc(100vh-4rem)] h-[calc(100vh-4rem)] flex flex-1 overflow-hidden'>
+            <main className='max-h-[calc(100vh-4rem)] h-[calc(100vh-4rem)] flex flex-1 overflow-auto'>
                 <div className='flex h-full w-full '>
                     <div className='w-12 border-zinc-800 bg-zinc-900'>
                         <TabbedLeftPanel />

@@ -5,16 +5,16 @@ import React from 'react'
 
 const RealtimePage = () => {
     return (
-        <div className="flex flex-col h-full ">
+        <div className="flex flex-col h-full w-full overflow-auto">
             <div className="px-6 py-6 space-y-2 ">
-                    <h1 className='text-2xl font-bold'>WebSocket</h1>
-                    <p className='text-sm text-muted-foreground'>
-                        Connect to a websocket server and start testing!
-                    </p>
-                    <RealtimeConnectionBar/>
+                <h1 className='text-2xl font-bold'>WebSocket</h1>
+                <p className='text-sm text-muted-foreground'>
+                    Connect to a websocket server and start testing!
+                </p>
+                <RealtimeConnectionBar />
             </div>
             <div className='flex-1 overflow-auto flex flex-col px-6 pb-6 '>
-                <RealtimeMessageEditor/>
+                <RealtimeMessageEditor />
             </div>
         </div>
     )
