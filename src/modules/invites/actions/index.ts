@@ -21,7 +21,7 @@ export const generateWorkspaceInvite = async (workspaceId: string) => {
         }
     })
 
-    return `${process.env.NEXT_PUBLIC_APP_URL}/${invites.token}`
+    return `${process.env.NEXT_PUBLIC_APP_URL}/invites/${invites.token}`
 }
 
 export const acceptWorkspaceInvite = async (token: string) => {
