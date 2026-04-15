@@ -8,6 +8,7 @@ import AddRequestCollectionModal from './addRequestModal'
 import { useGetAllRequestFromCollection } from '@/modules/request/hooks/request'
 import { REST_METHOD } from '@prisma/client'
 import { useRequestPlaygroundStore } from '@/modules/request/store/useRequestStore'
+import RenameRequestModal from '@/modules/request/components/renameRequestModal'
 
 interface Props {
     collection: {
@@ -22,6 +23,8 @@ const CollectionFolder = ({ collection }: Props) => {
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [isAddRequestOpen, setIsAddRequestOpen] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isRenameOpen, setIsRenameOpen] = useState(false);
+    const [selectedRequest, setSelectedRequest] = useState<any>(null);
 
     const { data: requestData, isPending, isError } = useGetAllRequestFromCollection(collection.id)
     const { openRequestTab } = useRequestPlaygroundStore()
@@ -162,7 +165,13 @@ const CollectionFolder = ({ collection }: Props) => {
                                                     </button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent className="w-32">
-                                                    <DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setSelectedRequest(request);
+                                                            setIsRenameOpen(true);
+                                                        }}
+                                                    >
                                                         <Edit className="text-blue-400 mr-2 w-3 h-3" />
 
                                                         Edit
@@ -206,6 +215,11 @@ const CollectionFolder = ({ collection }: Props) => {
                 setIsModalOpen={setIsAddRequestOpen}
                 collectionId={collection.id}
                 initialName="Untitled Request"
+            />
+            <RenameRequestModal
+                isModalOpen={isRenameOpen}
+                setIsModalOpen={setIsRenameOpen}
+                request={selectedRequest}
             />
         </>
     )

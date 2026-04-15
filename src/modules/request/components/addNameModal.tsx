@@ -9,6 +9,8 @@ import { useSuggestRequestName } from "@/modules/ai/hooks/aiSuggestion";
 import { set } from "zod";
 import { Input } from "@/components/ui/input";
 import { REST_METHOD } from "@prisma/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { saveRequest } from "../actions";
 
 const AddNameModal = ({
   isModalOpen,
@@ -20,13 +22,14 @@ const AddNameModal = ({
   tabId: string;
 }) => {
   const { updateTab, tabs, markUnsaved } = useRequestPlaygroundStore();
-  const {mutateAsync , data , isPending , isError} = useSuggestRequestName();
+  const { mutateAsync, data, isPending, isError } = useSuggestRequestName();
   const tab = tabs.find((t) => t.id === tabId);
 
   const [name, setName] = useState(tab?.title || "");
-  const [suggestions, setSuggestions] = useState<Array<{name: string; reasoning: string}>>([]);
+  const [suggestions, setSuggestions] = useState<Array<{ name: string; reasoning: string }>>([]);
+  const queryClient = useQueryClient();
 
- 
+
   useEffect(() => {
     if (tab) setName(tab.title);
   }, [tabId]);
@@ -35,7 +38,20 @@ const AddNameModal = ({
     if (!name.trim()) return;
     try {
       updateTab(tabId, { title: name });
-      markUnsaved(tabId, true); 
+      markUnsaved(tabId, true);
+      if (tab?.requestId) {
+        await saveRequest(tab.requestId, {
+          name,
+          method: tab.method as REST_METHOD,
+          url: tab.url || "",
+          body: tab.body,
+          headers: tab.headers,
+          parameters: tab.parameters,
+        });
+        markUnsaved(tabId, false); // it's saved now
+        // invalidate so sidebar reflects the new name
+        queryClient.invalidateQueries({ queryKey: ["request"] });
+      }
       toast.success("Request name updated");
       setIsModalOpen(false);
       setSuggestions([]);
@@ -64,34 +80,34 @@ const AddNameModal = ({
             onChange={(e) => setName(e.target.value)}
           />
 
-           <Button 
-          variant={"outline"} 
-          size={"icon"} 
-          onClick={async () => {
-            if (!tab) return;
-            try {
+          <Button
+            variant={"outline"}
+            size={"icon"}
+            onClick={async () => {
+              if (!tab) return;
+              try {
                 console.log("is it working")
-              const result = await mutateAsync({
-                workspaceName: tab.workspaceId || "Default Workspace",
-                method: tab.method as REST_METHOD,
-                url: tab.url || "",
-                description: `Request in collection ${tab.collectionId || ""}`
-              });
-              console.log("is it working" ,result)
-              
-              if (result.suggestions && result.suggestions.length > 0) {
-                setSuggestions(result.suggestions);
-                setName(result.suggestions[0].name);
-                toast.success("Generated name suggestions");
+                const result = await mutateAsync({
+                  workspaceName: tab.workspaceId || "Default Workspace",
+                  method: tab.method as REST_METHOD,
+                  url: tab.url || "",
+                  description: `Request in collection ${tab.collectionId || ""}`
+                });
+                console.log("is it working", result)
+
+                if (result.suggestions && result.suggestions.length > 0) {
+                  setSuggestions(result.suggestions);
+                  setName(result.suggestions[0].name);
+                  toast.success("Generated name suggestions");
+                }
+              } catch (error) {
+                toast.error("Failed to generate name suggestions");
               }
-            } catch (error) {
-              toast.error("Failed to generate name suggestions");
-            }
-          }} 
-          disabled={isPending}
-        >
-          <Sparkles className="h-5 w-5 text-indigo-500" />
-        </Button>
+            }}
+            disabled={isPending}
+          >
+            <Sparkles className="h-5 w-5 text-indigo-500" />
+          </Button>
         </div>
         {suggestions.length > 0 && (
           <div className="flex flex-col gap-2">
@@ -107,7 +123,7 @@ const AddNameModal = ({
             ))}
           </div>
         )}
-       
+
       </div>
     </Modal>
   );
