@@ -9,6 +9,7 @@ import { useGetAllRequestFromCollection } from '@/modules/request/hooks/request'
 import { REST_METHOD } from '@prisma/client'
 import { useRequestPlaygroundStore } from '@/modules/request/store/useRequestStore'
 import RenameRequestModal from '@/modules/request/components/renameRequestModal'
+import DeleteRequestModal from '@/modules/request/components/deleteCollectionModel'
 
 interface Props {
     collection: {
@@ -25,6 +26,7 @@ const CollectionFolder = ({ collection }: Props) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isRenameOpen, setIsRenameOpen] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState<any>(null);
+    const [isDeleteRequestOpen, setIsDeleteRequestOpen] = useState(false);
 
     const { data: requestData, isPending, isError } = useGetAllRequestFromCollection(collection.id)
     const { openRequestTab } = useRequestPlaygroundStore()
@@ -177,7 +179,13 @@ const CollectionFolder = ({ collection }: Props) => {
                                                         Edit
 
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setSelectedRequest(request);
+                                                            setIsDeleteRequestOpen(true);
+                                                        }}
+                                                    >
                                                         <Trash className="text-red-400 mr-2 w-3 h-3" />
                                                         Delete
                                                     </DropdownMenuItem>
@@ -221,6 +229,15 @@ const CollectionFolder = ({ collection }: Props) => {
                 setIsModalOpen={setIsRenameOpen}
                 request={selectedRequest}
             />
+
+            {selectedRequest && (
+                <DeleteRequestModal
+                    isModalOpen={isDeleteRequestOpen}
+                    setIsModalOpen={setIsDeleteRequestOpen}
+                    requestId={selectedRequest.id}
+                    collectionId={collection.id}
+                />
+            )}
         </>
     )
 }

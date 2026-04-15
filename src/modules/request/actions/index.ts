@@ -254,3 +254,9 @@ export async function runDirect(requestData: {
         };
     }
 }
+
+export const deleteRequest = async (id: string) => {
+    await db.request.delete({
+        where: { id }
+    });
+}

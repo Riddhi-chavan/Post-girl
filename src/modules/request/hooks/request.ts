@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getAllRequestFromCollection, addRequestToCollection, saveRequest, type Request, run } from "../actions";
+import { getAllRequestFromCollection, addRequestToCollection, saveRequest, type Request, run, deleteRequest } from "../actions";
 import { useRequestPlaygroundStore } from "../store/useRequestStore";
 
 export function useAddRequestToCollection(collectionId: string) {
@@ -47,4 +47,19 @@ export function useRunRequest(requestId: string) {
             setResponseViewerData(data)
         }
     })
+}
+
+export function useDeleteRequest(requestId: string, collectionId: string) {
+    const queryClient = useQueryClient();
+    const { tabs, closeTab } = useRequestPlaygroundStore();
+
+    return useMutation({
+        mutationFn: async () => deleteRequest(requestId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["request", collectionId] });
+            // 👇 close the tab if it's open
+            const openTab = tabs.find((t) => t.requestId === requestId);
+            if (openTab) closeTab(openTab.id);
+        }
+    });
 }
