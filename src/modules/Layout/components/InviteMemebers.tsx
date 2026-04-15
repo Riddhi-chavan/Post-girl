@@ -11,14 +11,29 @@ import {
     DropdownMenuSeparator,
     DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Hint } from "@/components/ui/hint";
 import { useWorkspaceStore } from "../store";
 import { toast } from "sonner";
+import { MEMBER_ROLE } from "@prisma/client";
 import { useGenerateWorkspaceInvite, useGetWorkspaceMemebers } from "@/modules/invites/hooks/invite";
+
+const roleDescriptions: Record<MEMBER_ROLE, string> = {
+    ADMIN: "Full access, can invite members",
+    EDITOR: "Can edit collections and requests",
+    VIEWER: "Can view and run requests only",
+};
 
 const InviteMember = () => {
     const [inviteLink, setInviteLink] = useState("");
+    const [role, setRole] = useState<MEMBER_ROLE>(MEMBER_ROLE.VIEWER); // 👈
     const { selectedWorkspace } = useWorkspaceStore();
 
     const { mutateAsync, isPending } = useGenerateWorkspaceInvite(
@@ -29,15 +44,13 @@ const InviteMember = () => {
         selectedWorkspace?.id || ""
     );
 
-    console.log("Selected Workspace members: ", workspaceMembers);
-
     const generateInviteLink = async () => {
         if (!selectedWorkspace?.id) {
             toast.error("Please select a workspace first");
             return;
         }
         try {
-            const response = await mutateAsync();
+            const response = await mutateAsync(role); // 👈 pass role
             setInviteLink(response);
             toast.success("Invite link generated!");
         } catch (error) {
@@ -73,7 +86,7 @@ const InviteMember = () => {
                             <p className="text-xs text-muted-foreground">Loading members...</p>
                         ) : (
                             workspaceMembers?.map((member: any) => (
-                                <Hint key={member.id} label={member.user.name || "Unknown User"}>
+                                <Hint key={member.id} label={`${member.user.name} (${member.role})`}>
                                     <Avatar className="border-2 border-background size-8 mt-2">
                                         <AvatarImage src={member.user.image || ""} />
                                         <AvatarFallback>
@@ -83,6 +96,26 @@ const InviteMember = () => {
                                 </Hint>
                             ))
                         )}
+                    </div>
+
+                    {/* Role Selector */}
+                    <div className="flex flex-col gap-1 mb-3">
+                        <label className="text-xs text-muted-foreground">Invite as</label>
+                        <Select value={role} onValueChange={(v) => setRole(v as MEMBER_ROLE)}>
+                            <SelectTrigger className="bg-zinc-900 border-zinc-700 text-white">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {Object.values(MEMBER_ROLE).map((r) => (
+                                    <SelectItem key={r} value={r}>
+                                        <div className="flex flex-col">
+                                            <span className="font-medium">{r}</span>
+                                            <span className="text-xs text-zinc-400">{roleDescriptions[r]}</span>
+                                        </div>
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     {/* Invite Link Input */}

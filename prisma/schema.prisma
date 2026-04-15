@@ -103,11 +103,12 @@ enum MEMBER_ROLE {
 }
 
 model WorkspaceInvite {
-  id          String    @id @default(cuid())
+  id          String      @id @default(cuid())
   workspaceId String
-  token       String    @unique
+  token       String      @unique
   expiresAt   DateTime?
   createdById String
+  role        MEMBER_ROLE @default(VIEWER)
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   createdBy User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
