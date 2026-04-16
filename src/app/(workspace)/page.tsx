@@ -30,7 +30,7 @@ const Page = () => {
         <RequestPlayground />
       </ResizablePanel>
       <ResizableHandle withHandle />
-      <ResizablePanel defaultSize={35} minSize={25} className="flex">
+      <ResizablePanel defaultSize={35} maxSize={700} minSize={30} className="flex ">
         <div className="flex-1">
           <TabbedSidebar currentWorkspace={currentWorkspace!} />
         </div>
