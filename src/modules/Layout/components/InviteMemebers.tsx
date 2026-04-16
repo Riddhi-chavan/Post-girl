@@ -23,7 +23,8 @@ import { Hint } from "@/components/ui/hint";
 import { useWorkspaceStore } from "../store";
 import { toast } from "sonner";
 import { MEMBER_ROLE } from "@prisma/client";
-import { useGenerateWorkspaceInvite, useGetWorkspaceMemebers } from "@/modules/invites/hooks/invite";
+import { useGenerateWorkspaceInvite, useGetMyRole, useGetWorkspaceMemebers } from "@/modules/invites/hooks/invite";
+import { cn } from "@/lib/utils";
 
 const roleDescriptions: Record<MEMBER_ROLE, string> = {
     ADMIN: "Full access, can invite members",
@@ -35,6 +36,9 @@ const InviteMember = () => {
     const [inviteLink, setInviteLink] = useState("");
     const [role, setRole] = useState<MEMBER_ROLE>(MEMBER_ROLE.VIEWER); // 👈
     const { selectedWorkspace } = useWorkspaceStore();
+    const { data: myRole } = useGetMyRole(selectedWorkspace?.id ?? "");
+    const hasPermission = myRole === MEMBER_ROLE.ADMIN;
+
 
     const { mutateAsync, isPending } = useGenerateWorkspaceInvite(
         selectedWorkspace?.id || ""
@@ -68,84 +72,98 @@ const InviteMember = () => {
     return (
         <DropdownMenu>
             <Hint label="Invite Member">
-                <DropdownMenuTrigger asChild>
-                    <Button className="border border-emerald-400 bg-emerald-400/10 hover:bg-emerald-400/20 text-emerald-400 hover:text-emerald-300">
+                <DropdownMenuTrigger asChild >
+                    <Button
+                        className={cn(
+                            "border border-emerald-400 bg-emerald-400/10 hover:bg-emerald-400/20 text-emerald-400 hover:text-emerald-300",
+                            !hasPermission && "opacity-50 cursor-not-allowed"
+                        )}
+                        onClick={(e) => {
+                            if (!hasPermission) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                toast.error("You don't have permission to invite members.");
+                            }
+                        }}
+                    >
                         <UserPlus className="size-4 text-emerald-400" />
                     </Button>
                 </DropdownMenuTrigger>
             </Hint>
+            {hasPermission && <>
+                <DropdownMenuContent className="w-80 rounded-xl" align="end">
+                    <div className="p-4">
+                        <DropdownMenuLabel>Invite to {selectedWorkspace?.name}</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
 
-            <DropdownMenuContent className="w-80 rounded-xl" align="end">
-                <div className="p-4">
-                    <DropdownMenuLabel>Invite to {selectedWorkspace?.name}</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
+                        {/* Members Avatars */}
+                        <div className="flex -space-x-2 overflow-hidden mb-3">
+                            {isLoading ? (
+                                <p className="text-xs text-muted-foreground">Loading members...</p>
+                            ) : (
+                                workspaceMembers?.map((member: any) => (
+                                    <Hint key={member.id} label={`${member.user.name} (${member.role})`}>
+                                        <Avatar className="border-2 border-background size-8 mt-2">
+                                            <AvatarImage src={member.user.image || ""} />
+                                            <AvatarFallback>
+                                                {member.user.name?.charAt(0) || "?"}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                    </Hint>
+                                ))
+                            )}
+                        </div>
 
-                    {/* Members Avatars */}
-                    <div className="flex -space-x-2 overflow-hidden mb-3">
-                        {isLoading ? (
-                            <p className="text-xs text-muted-foreground">Loading members...</p>
-                        ) : (
-                            workspaceMembers?.map((member: any) => (
-                                <Hint key={member.id} label={`${member.user.name} (${member.role})`}>
-                                    <Avatar className="border-2 border-background size-8 mt-2">
-                                        <AvatarImage src={member.user.image || ""} />
-                                        <AvatarFallback>
-                                            {member.user.name?.charAt(0) || "?"}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                </Hint>
-                            ))
-                        )}
-                    </div>
+                        {/* Role Selector */}
+                        <div className="flex flex-col gap-1 mb-3">
+                            <label className="text-xs text-muted-foreground">Invite as</label>
+                            <Select value={role} onValueChange={(v) => setRole(v as MEMBER_ROLE)}>
+                                <SelectTrigger className="bg-zinc-900 border-zinc-700 text-white">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {Object.values(MEMBER_ROLE).map((r) => (
+                                        <SelectItem key={r} value={r}>
+                                            <div className="flex flex-col">
+                                                <span className="font-medium">{r}</span>
+                                                <span className="text-xs text-zinc-400">{roleDescriptions[r]}</span>
+                                            </div>
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-                    {/* Role Selector */}
-                    <div className="flex flex-col gap-1 mb-3">
-                        <label className="text-xs text-muted-foreground">Invite as</label>
-                        <Select value={role} onValueChange={(v) => setRole(v as MEMBER_ROLE)}>
-                            <SelectTrigger className="bg-zinc-900 border-zinc-700 text-white">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {Object.values(MEMBER_ROLE).map((r) => (
-                                    <SelectItem key={r} value={r}>
-                                        <div className="flex flex-col">
-                                            <span className="font-medium">{r}</span>
-                                            <span className="text-xs text-zinc-400">{roleDescriptions[r]}</span>
-                                        </div>
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                        {/* Invite Link Input */}
+                        <div className="flex gap-2 items-center">
+                            <Input
+                                value={inviteLink}
+                                placeholder="Generate an invite link..."
+                                readOnly
+                            />
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={copyToClipboard}
+                                disabled={!inviteLink}
+                            >
+                                <Copy className="h-4 w-4" />
+                            </Button>
+                        </div>
 
-                    {/* Invite Link Input */}
-                    <div className="flex gap-2 items-center">
-                        <Input
-                            value={inviteLink}
-                            placeholder="Generate an invite link..."
-                            readOnly
-                        />
+                        {/* Generate Button */}
                         <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={copyToClipboard}
-                            disabled={!inviteLink}
+                            className="mt-3 w-full bg-emerald-500 hover:bg-emerald-600 text-white"
+                            onClick={generateInviteLink}
+                            disabled={isPending}
                         >
-                            <Copy className="h-4 w-4" />
+                            <LinkIcon className="h-4 w-4 mr-2" />
+                            {isPending ? "Generating..." : "Generate Link"}
                         </Button>
                     </div>
+                </DropdownMenuContent>
+            </>}
 
-                    {/* Generate Button */}
-                    <Button
-                        className="mt-3 w-full bg-emerald-500 hover:bg-emerald-600 text-white"
-                        onClick={generateInviteLink}
-                        disabled={isPending}
-                    >
-                        <LinkIcon className="h-4 w-4 mr-2" />
-                        {isPending ? "Generating..." : "Generate Link"}
-                    </Button>
-                </div>
-            </DropdownMenuContent>
         </DropdownMenu>
     );
 };

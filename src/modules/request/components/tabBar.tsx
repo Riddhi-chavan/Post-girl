@@ -2,11 +2,17 @@ import React, { useState } from 'react'
 import { useRequestPlaygroundStore } from '../store/useRequestStore'
 import { X } from 'lucide-react';
 import AddNameModal from './addNameModal';
+import { useGetMyRole } from '@/modules/invites/hooks/invite';
+import { useWorkspaceStore } from '@/modules/Layout/store';
+import { MEMBER_ROLE } from '@prisma/client';
 
 const TabBar = () => {
     const { tabs, activeTabId, setActiveTab, addTab, closeTab } = useRequestPlaygroundStore()
     const [renameModalOpen, setRenameModalOpen] = useState(false);
     const [selectedTabId, setSelectedTabId] = useState<string | null>(null);
+    const { selectedWorkspace } = useWorkspaceStore();
+    const { data: myRole } = useGetMyRole(selectedWorkspace?.id ?? "");
+    const hasPermission = myRole === MEMBER_ROLE.ADMIN || myRole === MEMBER_ROLE.EDITOR;
 
     const requestColorMap: Record<string, string> = {
         GET: "text-green-500",
@@ -16,8 +22,10 @@ const TabBar = () => {
     };
 
     const onDoubleClick = (tabId: string) => {
-        setSelectedTabId(tabId)
-        setRenameModalOpen(true)
+        if (hasPermission) {
+            setSelectedTabId(tabId)
+            setRenameModalOpen(true)
+        }
     }
 
 
