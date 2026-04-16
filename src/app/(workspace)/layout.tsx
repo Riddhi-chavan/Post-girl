@@ -3,12 +3,16 @@ import Header from '@/modules/Layout/components/Header'
 import { initializeWorkspace } from '@/modules/workspace/actions'
 import TabbedLeftPanel from '@/modules/workspace/components/tabbedLeftPanel'
 import React from 'react'
+import { redirect } from 'next/navigation'
 
 const RootLayout = async ({ children }: { children: React.ReactNode }) => {
     const workspace = await initializeWorkspace()
     const user = await currentUser()
 
     console.log("workspace", workspace)
+    if (!user) {
+        return redirect("/sign-in")
+    }
     return (
         <>
             {/* @ts-ignore */}
