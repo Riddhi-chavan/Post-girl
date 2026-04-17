@@ -30,9 +30,20 @@ const RequestEditorArea = ({ tab, updateTab }: Props) => {
     };
 
     const getBodyData = () => {
+        const body = tab.body;
+        let bodyString = '';
+
+        if (typeof body === 'string') {
+            // plain string - use as-is
+            bodyString = body;
+        } else if (typeof body === 'object' && body !== null && 'raw' in body) {
+            // imported from Postman - unwrap the raw string
+            bodyString = (body as { raw: string }).raw ?? '';
+        }
+
         return {
             contentType: 'application/json' as const,
-            body: tab.body || ''
+            body: bodyString
         };
     };
 
@@ -55,6 +66,7 @@ const RequestEditorArea = ({ tab, updateTab }: Props) => {
     };
 
     const handleBodyChange = (data: { contentType: string; body?: string }) => {
+        // Always store as plain string, never as object
         updateTab(tab.id, { body: data.body || '' });
         toast.success("Body updated successfully")
     };

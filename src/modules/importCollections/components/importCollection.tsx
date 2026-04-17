@@ -45,7 +45,7 @@ export function ImportCollectionButton({ workspaceId }: { workspaceId: any }) {
                     onChange={handleFileChange}
                 />
                 <button
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 px-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center space-x-2"
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 px-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isPending}
                 >
