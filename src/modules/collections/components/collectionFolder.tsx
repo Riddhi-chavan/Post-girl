@@ -47,7 +47,7 @@ const CollectionFolder = ({ collection }: Props) => {
 
     const hasRequest = requestData && requestData.length > 0
 
-    console.log("hasPermission", hasPermission)
+    // console.log("hasPermission", hasPermission)
 
     return (
         <>

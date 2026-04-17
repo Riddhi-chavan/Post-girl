@@ -126,7 +126,7 @@ export async function run(requestId: string) {
             url: request.url,
             headers: request.headers as Record<string, string> || undefined,
             params: request.parameters as Record<string, any> || undefined,
-            body: request.body || undefined
+            body: resolveBody(request.body)
         };
 
         const result = await sendRequest(requestConfig);
@@ -259,4 +259,15 @@ export const deleteRequest = async (id: string) => {
     await db.request.delete({
         where: { id }
     });
+}
+
+function resolveBody(body: any): any {
+    if (!body) return undefined;
+    if (typeof body === 'object' && body !== null && 'raw' in body) {
+        try { return JSON.parse(body.raw) } catch { return body.raw }
+    }
+    if (typeof body === 'string') {
+        try { return JSON.parse(body) } catch { return body }
+    }
+    return body;
 }

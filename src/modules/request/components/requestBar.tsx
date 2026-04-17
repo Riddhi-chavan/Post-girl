@@ -13,7 +13,7 @@ interface Props {
     updateTab: (id: string, data: Partial<RequestTab>) => void
 }
 const RequestBar = ({ tab, updateTab }: Props) => {
-    const { mutateAsync, isPending } = useRunRequest(tab.requestId!)
+    const { mutateAsync, isPending } = useRunRequest()
     const requestColorMap: Record<string, string> = {
         [REST_METHOD.GET]: "text-green-500",
         [REST_METHOD.POST]: "text-blue-500",
