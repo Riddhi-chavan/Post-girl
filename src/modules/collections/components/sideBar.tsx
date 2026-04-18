@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { useCollections } from '../hooks/collections'
-import { Archive, Clock, Code, ExternalLink, HelpCircle, Loader, Plus, Search, Share2 } from 'lucide-react'
+import { Archive, Clock, Code, Download, ExternalLink, HelpCircle, Loader, Plus, Search, Share2, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import CreateCollection from './createCollection'
 import EmptyCollections from './emptyCollections'
 import CollectionFolder from './collectionFolder'
+import { ImportCollectionButton } from '@/modules/importCollections/components/importCollection'
 
 interface Props {
    currentWorkspace: {
@@ -46,6 +47,7 @@ export const TabbedSidebar = ({ currentWorkspace }: Props) => {
                         <span className='text-sm font-medium'>Collections</span>
                      </div>
                      <div className='flex items-center space-x-2'>
+
                         <HelpCircle className="w-4 h-4 text-zinc-400 hover:text-zinc-300 cursor-pointer" />
                         <ExternalLink className="w-4 h-4 text-zinc-400 hover:text-zinc-300 cursor-pointer" />
                      </div>
@@ -60,11 +62,16 @@ export const TabbedSidebar = ({ currentWorkspace }: Props) => {
                         />
                      </div>
                   </div>
-                  <div className='p-3 border-b border-zinc-800'>
+                  <div className='p-3 border-b border-zinc-800 flex justify-between items-center'>
                      <Button variant={"ghost"} onClick={() => { setIsModelOpen(true) }}>
                         <Plus className='w-4 h-4' />
                         <span className='text-sm font-medium'>New</span>
                      </Button>
+                     <div className='mr-1'>
+                        <ImportCollectionButton workspaceId={currentWorkspace?.id} showIcon={true} />
+                     </div>
+
+
                   </div>
 
                   {collections && collections.length > 0 ? (

@@ -1,6 +1,6 @@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { ChevronDown, ChevronRight, Edit, EllipsisVertical, FilePlus, Folder, Loader, Trash } from 'lucide-react'
+import { ChevronDown, ChevronRight, Edit, EllipsisVertical, FilePlus, Folder, Loader, Trash, Upload } from 'lucide-react'
 import React, { useState } from 'react'
 import EditCollectionModel from './editCollectionsModel'
 import DeleteCollectionModel from './deleteCollectionsModel'
@@ -12,6 +12,7 @@ import RenameRequestModal from '@/modules/request/components/renameRequestModal'
 import DeleteRequestModal from '@/modules/request/components/deleteCollectionModel'
 import { useGetMyRole } from '@/modules/invites/hooks/invite'
 import { useWorkspaceStore } from '@/modules/Layout/store'
+import { Hint } from '@/components/ui/hint'
 
 interface Props {
     collection: {
@@ -73,6 +74,9 @@ const CollectionFolder = ({ collection }: Props) => {
                         </CollapsibleTrigger>
                         {hasPermission &&
                             <div className='flex flex-row justify-center items-center space-x-2'>
+                                <Hint label="Export Collection">
+                                    <Upload className='h-4 w-4 text-zinc-400 hover:text-indigo-400 cursor-pointer' />
+                                </Hint>
                                 <FilePlus className='h-4 w-4 text-zinc-400 hover:text-indigo-400 cursor-pointer' onClick={() => setIsAddRequestOpen(true)} />
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
