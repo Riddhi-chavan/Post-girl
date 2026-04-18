@@ -74,61 +74,66 @@ const CollectionFolder = ({ collection }: Props) => {
                                 </span>
                             </div>
                         </CollapsibleTrigger>
-                        {hasPermission &&
-                            <div className='flex flex-row justify-center items-center space-x-2'>
-                                <Hint label="Export Collection">
-                                    <Upload className={`h-4 w-4 cursor-pointer transition-colors ${isExporting ? 'text-indigo-400 animate-pulse' : 'text-zinc-400 hover:text-indigo-400'
-                                        }`}
-                                        onClick={() => exportCol(collection.id)} />
-                                </Hint>
-                                <FilePlus className='h-4 w-4 text-zinc-400 hover:text-indigo-400 cursor-pointer' onClick={() => setIsAddRequestOpen(true)} />
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <button className="p-1 hover:bg-zinc-800 rounded">
-                                            <EllipsisVertical className="w-4 h-4 text-zinc-400 hover:text-indigo-400" />
-                                        </button>
-                                    </DropdownMenuTrigger>
 
-                                    <DropdownMenuContent className="w-48">
-                                        <DropdownMenuItem onClick={() => setIsAddRequestOpen(true)}>
-                                            <div className="flex flex-row justify-between items-center w-full">
-                                                <div className="font-semibold flex justify-center items-center">
-                                                    <FilePlus className="text-green-400 mr-2 w-4 h-4" />
-                                                    Add Request
-                                                </div>
-                                                <span className="text-xs text-zinc-400 bg-zinc-700 px-1 rounded">
-                                                    <span className='text-[7px] mr-[2px] text-center align-middle'>⌘</span>R
-                                                </span>
-                                            </div>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
-                                            <div className="flex flex-row justify-between items-center w-full">
-                                                <div className="font-semibold flex justify-center items-center">
-                                                    <Edit className="text-blue-400 mr-2 w-4 h-4" />
-                                                    Edit
-                                                </div>
-                                                <span className="text-xs text-zinc-400 bg-zinc-700 px-1 rounded">
-                                                    <span className='text-[7px] mr-[2px] text-center align-middle'>⌘</span>E
-                                                </span>
-                                            </div>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => setIsDeleteOpen(true)}>
-                                            <div className="flex flex-row justify-between items-center w-full">
-                                                <div className="font-semibold flex justify-center items-center">
-                                                    <Trash className="text-red-400 mr-2 w-4 h-4" />
-                                                    Delete
-                                                </div>
-                                                <span className="text-[10px] text-zinc-400 bg-zinc-700 px-1 rounded">
-                                                    <span className='text-[7px] mr-[2px] text-center align-middle'>⌘</span>D
-                                                </span>
+                        <div className='flex flex-row justify-center items-center space-x-2'>
+                            <Hint label="Export Collection">
+                                <Upload className={`h-4 w-4 cursor-pointer transition-colors ${isExporting ? 'text-indigo-400 animate-pulse' : 'text-zinc-400 hover:text-indigo-400'
+                                    }`}
+                                    onClick={() => exportCol(collection.id)} />
+                            </Hint>
+                            {hasPermission &&
+                                <>
+                                    <FilePlus className='h-4 w-4 text-zinc-400 hover:text-indigo-400 cursor-pointer' onClick={() => setIsAddRequestOpen(true)} />
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <button className="p-1 hover:bg-zinc-800 rounded">
+                                                <EllipsisVertical className="w-4 h-4 text-zinc-400 hover:text-indigo-400" />
+                                            </button>
+                                        </DropdownMenuTrigger>
 
-                                            </div>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
+                                        <DropdownMenuContent className="w-48">
+                                            <DropdownMenuItem onClick={() => setIsAddRequestOpen(true)}>
+                                                <div className="flex flex-row justify-between items-center w-full">
+                                                    <div className="font-semibold flex justify-center items-center">
+                                                        <FilePlus className="text-green-400 mr-2 w-4 h-4" />
+                                                        Add Request
+                                                    </div>
+                                                    <span className="text-xs text-zinc-400 bg-zinc-700 px-1 rounded">
+                                                        <span className='text-[7px] mr-[2px] text-center align-middle'>⌘</span>R
+                                                    </span>
+                                                </div>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
+                                                <div className="flex flex-row justify-between items-center w-full">
+                                                    <div className="font-semibold flex justify-center items-center">
+                                                        <Edit className="text-blue-400 mr-2 w-4 h-4" />
+                                                        Edit
+                                                    </div>
+                                                    <span className="text-xs text-zinc-400 bg-zinc-700 px-1 rounded">
+                                                        <span className='text-[7px] mr-[2px] text-center align-middle'>⌘</span>E
+                                                    </span>
+                                                </div>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => setIsDeleteOpen(true)}>
+                                                <div className="flex flex-row justify-between items-center w-full">
+                                                    <div className="font-semibold flex justify-center items-center">
+                                                        <Trash className="text-red-400 mr-2 w-4 h-4" />
+                                                        Delete
+                                                    </div>
+                                                    <span className="text-[10px] text-zinc-400 bg-zinc-700 px-1 rounded">
+                                                        <span className='text-[7px] mr-[2px] text-center align-middle'>⌘</span>D
+                                                    </span>
 
-                                </DropdownMenu>
-                            </div>
-                        }
+                                                </div>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+
+                                    </DropdownMenu>
+                                </>
+
+                            }
+                        </div>
+
                     </div>
                 </div >
                 <CollapsibleContent className='w-full'>
