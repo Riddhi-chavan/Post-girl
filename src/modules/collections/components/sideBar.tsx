@@ -6,6 +6,7 @@ import CreateCollection from './createCollection'
 import EmptyCollections from './emptyCollections'
 import CollectionFolder from './collectionFolder'
 import { ImportCollectionButton } from '@/modules/importCollections/components/importCollection'
+import CodeViewer from '@/modules/request/components/codeView'
 
 interface Props {
    currentWorkspace: {
@@ -87,6 +88,8 @@ export const TabbedSidebar = ({ currentWorkspace }: Props) => {
 
                </div>
             )
+         case "Code":
+            return <CodeViewer />
          default:
             return <div className='p-4 text-zinc-400 '>Select a tab to view content</div>
       }
@@ -109,7 +112,7 @@ export const TabbedSidebar = ({ currentWorkspace }: Props) => {
                </div>
             ))}
          </div>
-         <div className='flex-1 bg-zinc-900 overflow-y-auto w-full text-white'>
+         <div className='flex-1 bg-zinc-900 overflow-y-auto w-[210px] text-white'>
             {renderTabContent()}
          </div>
 
