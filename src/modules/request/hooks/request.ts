@@ -62,16 +62,30 @@ export function useRunRequest() {
                 method: activeTab.method,
                 url: activeTab.url,
                 headers: activeTab.headers
-                    ? JSON.parse(activeTab.headers).reduce((acc: Record<string, string>, h: { key: string; value: string }) => {
-                        if (h.key) acc[h.key] = h.value
-                        return acc
-                    }, {})
+                    ? (() => {
+                        // Already an object — don't parse
+                        const parsed = typeof activeTab.headers === 'string'
+                            ? JSON.parse(activeTab.headers)
+                            : activeTab.headers
+                        if (!Array.isArray(parsed)) return parsed
+                        return parsed.reduce((acc: Record<string, string>, h: { key: string; value: string }) => {
+                            if (h.key) acc[h.key] = h.value
+                            return acc
+                        }, {})
+                    })()
                     : undefined,
                 parameters: activeTab.parameters
-                    ? JSON.parse(activeTab.parameters).reduce((acc: Record<string, string>, p: { key: string; value: string }) => {
-                        if (p.key) acc[p.key] = p.value
-                        return acc
-                    }, {})
+                    ? (() => {
+                        // Already an object — don't parse
+                        const parsed = typeof activeTab.parameters === 'string'
+                            ? JSON.parse(activeTab.parameters)
+                            : activeTab.parameters
+                        if (!Array.isArray(parsed)) return parsed
+                        return parsed.reduce((acc: Record<string, string>, p: { key: string; value: string }) => {
+                            if (p.key) acc[p.key] = p.value
+                            return acc
+                        }, {})
+                    })()
                     : undefined,
                 body: resolvedBody
             })
