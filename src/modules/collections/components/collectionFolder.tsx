@@ -13,6 +13,7 @@ import DeleteRequestModal from '@/modules/request/components/deleteCollectionMod
 import { useGetMyRole } from '@/modules/invites/hooks/invite'
 import { useWorkspaceStore } from '@/modules/Layout/store'
 import { Hint } from '@/components/ui/hint'
+import { useExportCollection } from '../hooks/collections'
 
 interface Props {
     collection: {
@@ -36,6 +37,7 @@ const CollectionFolder = ({ collection }: Props) => {
     const { selectedWorkspace } = useWorkspaceStore();
     const { data: myRole } = useGetMyRole(selectedWorkspace?.id ?? "");
     const hasPermission = myRole === MEMBER_ROLE.ADMIN || myRole === MEMBER_ROLE.EDITOR;
+    const { mutate: exportCol, isPending: isExporting } = useExportCollection()
 
     const requestColorMap: Record<REST_METHOD, string> = {
         [REST_METHOD.GET]: "text-green-500",
@@ -75,7 +77,9 @@ const CollectionFolder = ({ collection }: Props) => {
                         {hasPermission &&
                             <div className='flex flex-row justify-center items-center space-x-2'>
                                 <Hint label="Export Collection">
-                                    <Upload className='h-4 w-4 text-zinc-400 hover:text-indigo-400 cursor-pointer' />
+                                    <Upload className={`h-4 w-4 cursor-pointer transition-colors ${isExporting ? 'text-indigo-400 animate-pulse' : 'text-zinc-400 hover:text-indigo-400'
+                                        }`}
+                                        onClick={() => exportCol(collection.id)} />
                                 </Hint>
                                 <FilePlus className='h-4 w-4 text-zinc-400 hover:text-indigo-400 cursor-pointer' onClick={() => setIsAddRequestOpen(true)} />
                                 <DropdownMenu>
