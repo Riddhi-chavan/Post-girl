@@ -24,9 +24,10 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
-  workSpaces       Workspace[]       @relation("UserWorkspaces")
-  memberships      WorkspaceMember[]
-  workspaceInvites WorkspaceInvite[]
+  workSpaces          Workspace[]          @relation("UserWorkspaces")
+  memberships         WorkspaceMember[]
+  workspaceInvites    WorkspaceInvite[]
+  savedSharedRequests SavedSharedRequest[]
 
   @@unique([email])
   @@map("user")
@@ -194,4 +195,16 @@ model SharedRequest {
   request   Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
   createdAt DateTime  @default(now())
   expiresAt DateTime?
+}
+
+model SavedSharedRequest {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token           String
+  requestSnapshot Json // snapshot of the request at time of saving
+  savedAt         DateTime @default(now())
+
+  @@unique([userId, token])
+  @@map("saved_shared_request")
 }

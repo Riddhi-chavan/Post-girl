@@ -1,6 +1,8 @@
 'use client'
 import React, { useState } from 'react'
-import { Copy, Check, Play, Loader, ArrowRight } from 'lucide-react'
+import { Copy, Check, Play, Loader, ArrowRight, BookmarkPlus } from 'lucide-react'
+import { useSaveSharedRequest } from '@/modules/share/hooks'
+import { toast } from 'sonner'
 
 interface Props {
     request: {
@@ -32,6 +34,8 @@ export default function SharePageClient({ request, token }: Props) {
         duration: number
     } | null>(null)
     const [runError, setRunError] = useState<string | null>(null)
+    const { mutate: saveToAccount, isPending: isSaving } = useSaveSharedRequest()
+    const [saved, setSaved] = useState(false)
 
     const handleCopyUrl = async () => {
         await navigator.clipboard.writeText(window.location.href)
@@ -105,6 +109,17 @@ export default function SharePageClient({ request, token }: Props) {
 
     const bodyStr = resolveBody(request.body)
 
+    const handleSave = () => {
+        saveToAccount(token, {
+            onSuccess: () => {
+                setSaved(true)
+                toast.success("Saved to your account!")
+            },
+            onError: () => toast.error("Failed to save")
+        })
+    }
+
+
     return (
         <div className="min-h-screen bg-zinc-950 text-white">
             {/* Top nav */}
@@ -115,6 +130,18 @@ export default function SharePageClient({ request, token }: Props) {
                     <span className="text-zinc-400 text-sm">Shared Request</span>
                 </div>
                 <div className="flex items-center gap-2">
+                    <button
+                        onClick={handleSave}
+                        disabled={isSaving || saved}
+                        className="flex items-center gap-1.5 text-xs text-white bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-lg px-3 py-1.5 transition-colors"
+                    >
+                        {isSaving
+                            ? <><Loader className="w-3 h-3 animate-spin" /> Saving...</>
+                            : saved
+                                ? <><Check className="w-3 h-3" /> Saved!</>
+                                : <><BookmarkPlus className="w-3 h-3" /> Save to my account</>
+                        }
+                    </button>
                     <button
                         onClick={handleCopyUrl}
                         className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white border border-zinc-700 rounded-lg px-3 py-1.5 transition-colors hover:border-zinc-500"

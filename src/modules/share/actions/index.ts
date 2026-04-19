@@ -43,3 +43,50 @@ export const deleteShareLink = async (requestId: string) => {
         where: { requestId }
     })
 }
+
+export const saveSharedRequestToAccount = async (userId: string, token: string) => {
+    const shared = await db.sharedRequest.findUnique({
+        where: { token },
+        include: {
+            request: {
+                select: {
+                    name: true,
+                    method: true,
+                    url: true,
+                    headers: true,
+                    parameters: true,
+                    body: true,
+                }
+            }
+        }
+    })
+
+    if (!shared) throw new Error("Shared request not found or expired")
+
+    // Upsert — don't duplicate if already saved
+    const saved = await db.savedSharedRequest.upsert({
+        where: { userId_token: { userId, token } },
+        update: {},
+        create: {
+            userId,
+            token,
+            requestSnapshot: shared.request as any,
+        }
+    })
+
+    return saved
+}
+
+export const getRequestsSharedWithMe = async (userId: string) => {
+    const saved = await db.savedSharedRequest.findMany({
+        where: { userId },
+        orderBy: { savedAt: 'desc' }
+    })
+    return saved
+}
+
+export const removeSavedSharedRequest = async (userId: string, id: string) => {
+    await db.savedSharedRequest.delete({
+        where: { id, userId }
+    })
+}

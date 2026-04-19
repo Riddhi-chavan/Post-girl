@@ -8,6 +8,7 @@ import CollectionFolder from './collectionFolder'
 import { ImportCollectionButton } from '@/modules/importCollections/components/importCollection'
 import CodeViewer from '@/modules/request/components/codeView'
 import HistoryViewer from '@/modules/history/components/historyViewer'
+import SharedLinksViewer from '@/modules/share/components/SharedLinksViewer'
 
 interface Props {
    currentWorkspace: {
@@ -93,6 +94,8 @@ export const TabbedSidebar = ({ currentWorkspace }: Props) => {
             return <CodeViewer />
          case "History":
             return <HistoryViewer />
+         case "Share":
+            return <SharedLinksViewer />
          default:
             return <div className='p-4 text-zinc-400 '>Select a tab to view content</div>
       }
