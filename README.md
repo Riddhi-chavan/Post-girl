@@ -93,8 +93,7 @@ A full-stack, browser-based API testing platform inspired by Postman, built from
 ---
 
 ### Demo
-
-![demo](https://github.com/user-attachments/assets/a47b464b-ed48-4eca-8a6f-7b5811dfdc59)
+https://github.com/user-attachments/assets/a47b464b-ed48-4eca-8a6f-7b5811dfdc59
 ---
 
 ### Live Demo
