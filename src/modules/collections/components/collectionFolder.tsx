@@ -1,6 +1,6 @@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { ChevronDown, ChevronRight, Edit, EllipsisVertical, FilePlus, Folder, Loader, Trash, Upload } from 'lucide-react'
+import { ChevronDown, ChevronRight, Edit, EllipsisVertical, FilePlus, Folder, Loader, Share2, Trash, Upload } from 'lucide-react'
 import React, { useState } from 'react'
 import EditCollectionModel from './editCollectionsModel'
 import DeleteCollectionModel from './deleteCollectionsModel'
@@ -14,6 +14,7 @@ import { useGetMyRole } from '@/modules/invites/hooks/invite'
 import { useWorkspaceStore } from '@/modules/Layout/store'
 import { Hint } from '@/components/ui/hint'
 import { useExportCollection } from '../hooks/collections'
+import ShareRequestModal from '@/modules/share/components/shareRequestModal'
 
 interface Props {
     collection: {
@@ -31,6 +32,9 @@ const CollectionFolder = ({ collection }: Props) => {
     const [isRenameOpen, setIsRenameOpen] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState<any>(null);
     const [isDeleteRequestOpen, setIsDeleteRequestOpen] = useState(false);
+    const [isShareOpen, setIsShareOpen] = useState(false)
+    const [shareRequest, setShareRequest] = useState<any>(null)
+
 
     const { data: requestData, isPending, isError } = useGetAllRequestFromCollection(collection.id)
     const { openRequestTab } = useRequestPlaygroundStore()
@@ -211,6 +215,16 @@ const CollectionFolder = ({ collection }: Props) => {
                                                             <Trash className="text-red-400 mr-2 w-3 h-3" />
                                                             Delete
                                                         </DropdownMenuItem>
+                                                        <DropdownMenuItem
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                setShareRequest(request)
+                                                                setIsShareOpen(true)
+                                                            }}
+                                                        >
+                                                            <Share2 className="text-indigo-400 mr-2 w-3 h-3" />
+                                                            Share
+                                                        </DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </div>
@@ -261,6 +275,15 @@ const CollectionFolder = ({ collection }: Props) => {
                     setIsModalOpen={setIsDeleteRequestOpen}
                     requestId={selectedRequest.id}
                     collectionId={collection.id}
+                />
+            )}
+
+            {shareRequest && (
+                <ShareRequestModal
+                    isOpen={isShareOpen}
+                    setIsOpen={setIsShareOpen}
+                    requestId={shareRequest.id}
+                    requestName={shareRequest.name}
                 />
             )}
         </>

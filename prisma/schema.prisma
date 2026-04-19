@@ -167,8 +167,9 @@ model Request {
   response Json?
 
   collectionId String
-  collection   Collection   @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  collection   Collection      @relation(fields: [collectionId], references: [id], onDelete: Cascade)
   runs         RequestRun[]
+  sharedLinks  SharedRequest[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -184,4 +185,13 @@ model RequestRun {
   body       Json?
   durationMs Int?
   createdAt  DateTime @default(now())
+}
+
+model SharedRequest {
+  id        String    @id @default(cuid())
+  token     String    @unique @default(cuid())
+  requestId String
+  request   Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
 }
