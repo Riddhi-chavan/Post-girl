@@ -37,7 +37,8 @@ export function useSaveRequest(id: string) {
 
 export function useRunRequest() {
     const queryClient = useQueryClient()
-    const { setResponseViewerData, tabs, activeTabId } = useRequestPlaygroundStore()
+    // const { setResponseViewerData, tabs, activeTabId } = useRequestPlaygroundStore()
+    const { tabs, activeTabId, updateTab } = useRequestPlaygroundStore()
 
     return useMutation({
         mutationFn: async () => {
@@ -93,7 +94,9 @@ export function useRunRequest() {
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ["request"] })
             //@ts-ignore
-            setResponseViewerData(data)
+            if (activeTabId) {
+                updateTab(activeTabId, { responseData: data as any })
+            }
         }
     })
 }

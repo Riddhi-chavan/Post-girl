@@ -5,7 +5,7 @@ import RequestEditorArea from './requestEditorArea'
 import ResponseViewer from './responseViewer'
 
 const RequestEditor = () => {
-    const { tabs, activeTabId, updateTab, responseViewerData } = useRequestPlaygroundStore()
+    const { tabs, activeTabId, updateTab } = useRequestPlaygroundStore()
     const activeTab = tabs.find((t) => t.id === activeTabId) || tabs[0]
     if (!activeTabId) return null
 
@@ -13,11 +13,11 @@ const RequestEditor = () => {
         <div className='flex flex-col items-center justify-start py-4 px-4 h-full'>
             <RequestBar tab={activeTab} updateTab={updateTab} />
             <div className='flex flex-1 flex-col w-full justify-start mt-4 items-center'>
-                <RequestEditorArea tab={activeTab} updateTab={updateTab} />
+                <RequestEditorArea key={activeTab.id} tab={activeTab} updateTab={updateTab} />
             </div>
-            {
-                responseViewerData && <ResponseViewer responseData={responseViewerData} />
-            }
+            {activeTab?.responseData && (
+                <ResponseViewer responseData={activeTab.responseData} />
+            )}
         </div>
     )
 }
