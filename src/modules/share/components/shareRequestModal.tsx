@@ -66,7 +66,7 @@ const ShareRequestModal = ({ isOpen, setIsOpen, requestId, requestName }: Props)
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="space-y-4 pt-2">
+                <div className="space-y-4 pt-2 max-w-[463px]">
                     <p className="text-sm text-zinc-400">
                         Share <span className="text-white font-medium">"{requestName}"</span> via a public link.
                         Anyone with the link can view this request.
