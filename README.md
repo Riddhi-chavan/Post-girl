@@ -1,3 +1,5 @@
+![banner](https://github.com/user-attachments/assets/320166d1-87df-46b1-8cb0-e0674a3efe2e)
+
 # Post-girl — Postman-Inspired API Testing & Collaboration Platform
 
 A full-stack, browser-based API testing platform inspired by Postman, built from scratch to demonstrate real-world web development skills. **Post-girl** replicates the core Postman experience — REST request building, collections, team workspaces, and run history — and goes further with a dedicated **WebSocket testing client**, AI-powered payload generation, public snapshot sharing, and granular team access controls.
